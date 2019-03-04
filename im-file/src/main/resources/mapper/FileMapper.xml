@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.plugin.file.dao.FileMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.plugin.file.model.FilePo">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="FILENAME" property="fileName" jdbcType="VARCHAR" />
+		<result column="NFILENAME" property="nFileName" jdbcType="VARCHAR" />
+		<result column="FILETYPE" property="fileType" jdbcType="VARCHAR" />
+		<result column="FILESIZE" property="fileSize" jdbcType="INTEGER" />
+		<result column="FILEMD5" property="fileMD5" jdbcType="VARCHAR" />
+		<result column="FILEPATH" property="filePath" jdbcType="VARCHAR" />
+		<result column="FILESTATUS" property="fileStatus" jdbcType="INTEGER" />
+		<result column="FILEPATHTYPE" property="filePathType" jdbcType="VARCHAR" />
+		<result column="CUSERID" property="cUserId" jdbcType="VARCHAR" />
+		<result column="UUSERID" property="uUserId" jdbcType="VARCHAR" />
+		<result column="CTIME" property="cTime" jdbcType="TIMESTAMP" />
+		<result column="UTIME" property="uTime" jdbcType="TIMESTAMP" />
+		<result column="DEL" property="del" jdbcType="INTEGER" />
+		<result column="OBJECTID" property="objectId" jdbcType="VARCHAR" />
+		<result column="OBJECTTYPE" property="objectType" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, FILENAME, NFILENAME, FILETYPE, FILESIZE, FILEMD5,FILEPATHTYPE,
+		FILEPATH, FILESTATUS, CTIME, UTIME, DEL
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from im_tp_file
+		where ID = #{id,jdbcType=VARCHAR} and DEL = 0
+	</select>
+	<select id="selectByMD5" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from im_tp_file
+		where FILEMD5 = #{fileMD5,jdbcType=VARCHAR} and FILESTATUS =
+		#{fileStatus,jdbcType=INTEGER} and DEL = 0
+	</select>
+	<insert id="insert" parameterType="com.allmsi.plugin.file.model.FilePo">
+		insert into im_tp_file (
+		<include refid="Base_Column_List" />
+		) values
+		(#{id,jdbcType=VARCHAR},#{fileName,jdbcType=VARCHAR},#{nFileName,jdbcType=VARCHAR},
+		#{fileType,jdbcType=VARCHAR},#{fileSize,jdbcType=INTEGER},#{fileMD5,jdbcType=VARCHAR},#{filePath,jdbcType=VARCHAR},
+		#{fileStatus,jdbcType=INTEGER},#{filePathType,jdbcType=VARCHAR},now(),#{uTime,jdbcType=TIMESTAMP},#{del,jdbcType=INTEGER})
+	</insert>
+	<update id="update" parameterType="com.allmsi.plugin.file.model.FilePo">
+		update im_tp_file set
+		FILESTATUS =
+		#{fileStatus,jdbcType=INTEGER},UTIME
+		=now()
+		<if test="fileName != null and fileName !=''">
+			, FILENAME=#{fileName,jdbcType=VARCHAR}
+		</if>
+		<if test="fileType != null and fileType !=''">
+			, FILETYPE=#{fileType,jdbcType=VARCHAR}
+		</if>
+		<if test="fileSize > 0">
+			, FILESIZE=#{fileSize,jdbcType=VARCHAR}
+		</if>
+		<if test="nFileName != null and nFileName !=''">
+			, NFILENAME=#{nFileName,jdbcType=VARCHAR}
+		</if>
+		<if test="fileType != null and fileType !=''">
+			, FILETYPE=#{fileType,jdbcType=VARCHAR}
+		</if>
+		<if test="filePath != null and filePath !=''">
+			, FILEPATH=#{filePath,jdbcType=VARCHAR}
+		</if>
+		WHERE ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteFlag" parameterType="java.lang.String">
+		update im_tp_file set DEL = 1,UTIME =now() WHERE ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from im_tp_file where ID = #{id,jdbcType=VARCHAR}
+	</delete>
+	<select id="selectByIds" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+	    from im_tp_file where DEL = 0 and ID in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

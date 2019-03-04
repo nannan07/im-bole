@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.plugin.file.dao.FileObjectMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.plugin.file.model.FileObjectPo">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="FILEID" property="fileId" jdbcType="VARCHAR" />
+		<result column="OBJECTID" property="objectId" jdbcType="VARCHAR" />
+		<result column="OBJECTTYPE" property="objectType" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, FILEID, OBJECTID, OBJECTTYPE
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from im_tp_file_object
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByMD5" resultMap="com.allmsi.plugin.file.dao.FileMapper.BaseResultMap"
+		parameterType="java.util.Map">
+		select f.ID, f.FILENAME, f.FILESIZE, f.FILESTATUS, fo.OBJECTID,
+		fo.OBJECTTYPE from im_tp_file f LEFT JOIN im_tp_file_object fo on
+		f.ID=fo.FILEID
+		where f.FILEMD5 = #{fileMD5,jdbcType=VARCHAR} and f.FILESTATUS =
+		#{fileStatus,jdbcType=INTEGER} and fo.OBJECTID = #{objectId,jdbcType=VARCHAR} and f.DEL =0
+	</select>
+	<select id="selectByObject" resultMap="com.allmsi.plugin.file.dao.FileMapper.BaseResultMap"
+		parameterType="java.util.Map">
+		select f.ID, f.FILENAME, f.FILESIZE, f.FILESTATUS, fo.OBJECTID, fo.OBJECTTYPE from
+		im_tp_file f LEFT JOIN im_tp_file_object fo on
+		f.ID=t1.FILEID
+		<where>
+			f.DEL=0
+			<if test="objectId != null and objectId !=''">
+				and fo.OBJECTID=#{objectId,jdbcType=VARCHAR}
+			</if>
+			<if test="objectType != null and objectType !=''">
+				and fo.OBJECTTYPE = #{objectType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="com.allmsi.plugin.file.model.FileObjectPo">
+		insert into im_tp_file_object (
+		<include refid="Base_Column_List" />
+		) values (#{id,jdbcType=VARCHAR}, #{fileId,jdbcType=VARCHAR},
+		#{objectId,jdbcType=VARCHAR},
+		#{objectType,jdbcType=VARCHAR})
+	</insert>
+	<delete id="deleteByFileId" parameterType="java.lang.String">
+		delete from  im_tp_file_object
+		where FILEID = #{fileId,jdbcType=VARCHAR}
+	</delete>
+</mapper>

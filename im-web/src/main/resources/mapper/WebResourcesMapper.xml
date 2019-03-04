@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.sys.dao.WebResourcesMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.sys.model.po.WebRes">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="resUrl" property="resUrl" jdbcType="VARCHAR" />
+		<result column="authDealId" property="authDealId" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectResListForCacheAdd" resultMap="BaseResultMap">
+		select
+		r.resUrl,ra.authDealId
+		from im_ta_resources r
+		left join im_ta_resources_auth ra on r.id = ra.resId  and  ra.del = 0 
+		where r.del = 0 and flag = 0
+	</select>
+</mapper>

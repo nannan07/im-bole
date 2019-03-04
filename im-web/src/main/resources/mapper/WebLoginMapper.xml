@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.sys.dao.WebLoginMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.sys.model.po.WebUser">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="userName" property="userName" jdbcType="VARCHAR" />
+		<result column="roleId" property="roleId" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Simple_Column_List">
+		u.id,u.userName
+	</sql>
+	<sql id="Role_Column_List">
+		r.id as roleId
+	</sql>
+	<select id="login" resultMap="BaseResultMap" parameterType="com.allmsi.sys.model.po.WebUser">
+		select
+		<include refid="Simple_Column_List" />
+		from im_ta_user u
+		where
+		u.del=0 and
+		(u.loginName = #{loginName,jdbcType=VARCHAR} and u.loginName is not null
+		or u.phone = #{loginName,jdbcType=VARCHAR}
+		or u.email = #{loginName,jdbcType=VARCHAR})
+		and u.pwd = #{password,jdbcType=VARCHAR}
+	</select>
+	<select id="selectRoleIdsByUserId" resultType="java.lang.String"
+		parameterType="java.lang.String">
+		select
+		<include refid="Role_Column_List" />
+		from im_ta_role r
+		LEFT JOIN im_ta_user_role ur ON r.id=ur.roleId
+		WHERE
+		r.del=0 and ur.userId= #{_parameter,jdbcType=VARCHAR}
+	</select>
+</mapper>

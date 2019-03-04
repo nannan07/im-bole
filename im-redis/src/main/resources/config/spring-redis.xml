@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd 
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd 
+       	http://www.springframework.org/schema/tx 
+       	http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        http://www.springframework.org/schema/task 
+        http://www.springframework.org/schema/task/spring-task-4.2.xsd">
+
+	<!-- 引入属性文件 -->
+	<context:property-placeholder location="classpath*:config/im-redisSource.properties,classpath*:config/im-config.properties"
+		ignore-unresolvable="true" />
+
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg index="0" ref="jedisPoolConfig"/>
+		<constructor-arg index="1" value="${im.redis.host}"/> 
+		<constructor-arg index="2" value="${im.redis.port}"/> 
+		<constructor-arg index="3" value="${im.redis.timeout}"/> 
+		<constructor-arg index="4" value="${im.redis.pass}"/> 
+		<constructor-arg index="5" value="${im.redis.database}"/>
+	</bean>
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${im.redis.maxTotal}" /><!--最大连接数 -->
+		<property name="maxIdle" value="${im.redis.maxIdle}" /><!--最大空闲连接数 -->	
+		<property name="numTestsPerEvictionRun" value="${im.redis.numTestsPerEvictionRun}" />	
+		<property name="timeBetweenEvictionRunsMillis" value="${im.redis.timeBetweenEvictionRunsMillis}" />
+		<property name="minEvictableIdleTimeMillis" value="${im.redis.minEvictableIdleTimeMillis}" />
+		<property name="softMinEvictableIdleTimeMillis" value="${im.redis.softMinEvictableIdleTimeMillis}" />
+		<property name="maxWaitMillis" value="${im.redis.maxWaitMillis}" /><!--获取连接时的最大等待毫秒数 -->
+		<property name="testOnBorrow" value="${im.redis.testOnBorrow}" /><!--在获取连接的时候检查有效性,默认false --> 
+		<property name="testWhileIdle" value="${im.redis.testWhileIdle}" /><!--在空闲时检查有效性, 默认false -->
+		<property name="testOnReturn" value="${im.redis.testOnReturn}" /><!--在return给pool时，是否提前进行validate操作 -->
+		<property name="jmxEnabled" value="${im.redis.jmxEnabled}" /><!--是否启用pool的jmx管理功能, 默认true -->
+		<property name="jmxNamePrefix" value="${im.redis.jmxNamePrefix}" /><!-- 默 认为"pool" -->
+		<property name="blockWhenExhausted" value="${im.redis.blockWhenExhausted}" />
+	</bean>
+</beans>

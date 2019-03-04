@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.sys.dao.WebMenuMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.sys.model.po.WebMenu">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="label" property="label" jdbcType="VARCHAR" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="icon" property="icon" jdbcType="VARCHAR" />
+		<result column="pId" property="pId" jdbcType="VARCHAR" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="cTime" property="cTime" jdbcType="TIMESTAMP" />
+		<result column="uTime" property="uTime" jdbcType="TIMESTAMP" />
+		<result column="del" property="del" jdbcType="BIT" />
+		
+		<result column="authDealId" property="authDealId" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Menu_ma_Column_List">
+	m.id, m.label, m.path, m.icon, m.pId,m.sort, m.cTime
+	</sql>
+	<select id="selectMenuByAuthDealIds" resultMap="BaseResultMap"
+		parameterType="java.util.List">
+		select DISTINCT
+		<include refid="Menu_ma_Column_List" />
+		from im_ta_menu m
+		left join im_ta_menu_auth ma on m.id = ma.menuId and ma.del=0
+		where m.del=0 and ma.authDealId in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by m.sort
+	</select>
+	<select id="selectMenuListForCacheAdd" resultMap="BaseResultMap">
+		select m.id, m.label, m.path, m.icon, m.pId,m.sort, m.cTime,ma.authDealId
+		from im_ta_menu m
+		left join im_ta_menu_auth ma on m.id = ma.menuId and ma.del=0
+		where m.del=0 
+		order by m.sort
+	</select>
+</mapper>

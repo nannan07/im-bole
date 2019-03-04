@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.plugin.open.dao.OpenMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.plugin.open.model.OpenPo">
+		<id column="ID" property="id" jdbcType="VARCHAR" />
+		<result column="TOKEN" property="token" jdbcType="VARCHAR" />
+		<result column="CODE" property="code" jdbcType="VARCHAR" />
+		<result column="OBJECTID" property="objectId" jdbcType="VARCHAR" />
+		<result column="RECEIVEID" property="receiveId" jdbcType="VARCHAR" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<result column="TCOUNT" property="tCount" jdbcType="INTEGER" />
+		<result column="CCOUNT" property="cCount" jdbcType="INTEGER" />
+		<result column="CUSERID" property="cUserId" jdbcType="VARCHAR" />
+		<result column="UUSERID" property="uUserId" jdbcType="VARCHAR" />
+		<result column="CTIME" property="cTime" jdbcType="TIMESTAMP" />
+		<result column="UTIME" property="uTime" jdbcType="TIMESTAMP" />
+		<result column="DEL" property="del" jdbcType="INTEGER" />
+		
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, TOKEN, CODE, OBJECTID, RECEIVEID, CUSER, TYPE, CTIME,
+		TCOUNT,CCOUNT
+	</sql>
+	<select id="select" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from im_tp_open
+		where TOKEN = #{token,jdbcType=VARCHAR} and DEL = 0
+		<if test="code != null and  code !='' ">
+			and CODE = #{code,jdbcType=VARCHAR}
+		</if>
+		and CTIME + INTERVAL #{expiry_date,jdbcType=INTEGER} DAY &gt;= now()
+		and CCOUNT &lt;TCOUNT
+	</select>
+	<insert id="insertBatch" parameterType="java.util.List">
+		insert into im_tp_open (ID, TOKEN, CODE, OBJECTID, RECEIVEID, CUSER, TYPE, CTIME,
+		TCOUNT,DEL)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id}, #{item.token}, #{item.code},
+			#{item.objectId},#{item.receiveId},#{item.cUserId},#{item.type},now(),#{item.tCount},0)
+		</foreach>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="java.lang.String">
+		update im_tp_open
+		set
+		CCOUNT = CCOUNT+1,UTIME = now()
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

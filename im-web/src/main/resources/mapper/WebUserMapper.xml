@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.allmsi.sys.dao.WebUserMapper">
+	<resultMap id="BaseResultMap" type="com.allmsi.sys.model.po.WebUser">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="loginName" property="loginName" jdbcType="VARCHAR" />
+		<result column="userName" property="userName" jdbcType="VARCHAR" />
+		<result column="pwd" property="password" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="INTEGER" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="cUserId" property="cUserId" jdbcType="VARCHAR" />
+		<result column="uUserId" property="uUserId" jdbcType="VARCHAR" />
+		<result column="cTime" property="cTime" jdbcType="TIMESTAMP" />
+		
+		<result column="roleId" property="roleId" jdbcType="VARCHAR" />
+		<result column="roleName" property="roleName" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, pwd,userName,phone,email,sex,sort,cTime
+	</sql>
+	<sql id="Simple_Column_List">
+		u.id,u.userName
+	</sql>
+	<sql id="Role_Column_List">
+		r.id as roleId, r.roleName
+	</sql>
+	<select id="login" resultMap="BaseResultMap" parameterType="com.allmsi.sys.model.po.WebUser">
+		select
+		<include refid="Simple_Column_List" />
+		from im_ta_user u
+		where
+		u.del=0 and
+		(u.loginName = #{loginName,jdbcType=VARCHAR} and u.loginName is not null
+		or u.phone = #{loginName,jdbcType=VARCHAR}
+		or u.email = #{loginName,jdbcType=VARCHAR})
+		and u.pwd = #{password,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from im_ta_user
+		where del = 0 and id = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="selectRoleByUserId" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Role_Column_List" />
+		from im_ta_role r
+		LEFT JOIN im_ta_user_role ur ON r.id=ur.roleId
+		WHERE
+		r.del=0 and ur.userId= #{_parameter,jdbcType=VARCHAR}
+	</select>
+	<select id="checkUniqueId" resultType="java.lang.String"
+		parameterType="com.allmsi.sys.model.po.WebUser">
+		select id from im_ta_user where del = 0
+		<trim prefix="and (" suffix=")" suffixOverrides="or">
+			<if test="phone != null and phone != '' ">
+				phone = #{phone,jdbcType=VARCHAR} or
+			</if>
+			<if test="email != null and email != '' ">
+				email = #{email,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</select>
+	<select id="checkUnique" resultType="java.lang.Integer"
+		parameterType="com.allmsi.sys.model.po.WebUser">
+		select count(id) from im_ta_user where del = 0
+		<trim prefix="and (" suffix=")" suffixOverrides="or">
+			<if test="phone != null and phone != '' ">
+				phone = #{phone,jdbcType=VARCHAR} or
+			</if>
+			<if test="email != null and email != '' ">
+				email = #{email,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</select>
+	<select id="checkWebUser" resultType="java.lang.Integer"
+		parameterType="com.allmsi.sys.model.po.WebUser">
+		select count(id) from im_ta_user where del = 0
+		<if test="phone != null and phone != '' ">
+			and phone = #{phone,jdbcType=VARCHAR}
+		</if>
+		<if test="email != null and email != '' ">
+			and email = #{email,jdbcType=VARCHAR}
+		</if>
+	</select>
+	<insert id="insertSelective" parameterType="com.allmsi.sys.model.po.WebUser">
+		insert into im_ta_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="loginName != null">
+				loginName,
+			</if>
+			<if test="userName != null">
+				userName,
+			</if>
+			<if test="password != null">
+				pwd,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="email != null">
+				email,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="sort != null">
+				sort,
+			</if>
+			<if test="cUserId != null">
+				cUserId,
+			</if>
+			cTime, del
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null and id != '' ">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="loginName != null and loginName != '' ">
+				#{loginName,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null and userName != '' ">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null and password != '' ">
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null and phone != '' ">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null and email != '' ">
+				#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=INTEGER},
+			</if>
+			<if test="sort != null">
+				#{sort,jdbcType=INTEGER},
+			</if>
+			<if test="cUserId != null">
+				#{cUserId,jdbcType=VARCHAR},
+			</if>
+			now(), 0
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.allmsi.sys.model.po.WebUser">
+		update im_ta_user
+		<set>
+			<if test="userName != null and userName != '' ">
+				userName = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null and password != '' ">
+				pwd = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null and phone != '' ">
+				phone = #{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null and email != '' ">
+				email = #{email,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				sex = #{sex,jdbcType=INTEGER},
+			</if>
+			<if test="sort != null">
+				sort = #{sort,jdbcType=INTEGER},
+			</if>
+			<if test="uUserId != null">
+				uUserId = #{uUserId,jdbcType=VARCHAR},
+			</if>
+			uTime = now()
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>
